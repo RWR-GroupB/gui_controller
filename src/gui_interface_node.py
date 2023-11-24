@@ -57,19 +57,19 @@ class GuiInterface:
         ]
 
         # Creating the GUI components
-        for i_finger, finger_key in enumerate(hand_finger_joint_map):
+        for i, finger_key in enumerate(hand_finger_joint_map):
             group_frame = ttk.LabelFrame(master, text=f"{finger_key}")
             group_frame.pack(padx=10, pady=10, fill="both", expand="yes")
-            self.create_slider_group(group_frame, i_finger, finger_key)
+            self.create_slider_group(group_frame, i, finger_key)
 
 
     def create_slider_group(self, frame, group_index, finger):
         finger_subcomponents_map = hand_finger_joint_map[finger]
 
-        for j_finger_subcomponent, finger_subcomponent_key in enumerate(finger_subcomponents_map):
+        for j, finger_subcomponent_key in enumerate(finger_subcomponents_map):
             slider_label = ttk.Label(frame, text=f"{finger_subcomponent_key}")
             slider_label.pack(pady=5)
-            slider = ttk.Scale(frame, from_=0, to_=360, orient="horizontal", 
+            slider = ttk.Scale(frame, from_=0, to_=359, orient="horizontal", 
                                command=lambda value, index=finger_subcomponents_map[finger_subcomponent_key]: self.update_slider_value(value, index))
             slider.pack(pady=5)
 
