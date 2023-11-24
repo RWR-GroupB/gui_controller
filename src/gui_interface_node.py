@@ -7,60 +7,77 @@ from std_msgs.msg import Float32MultiArray
 import tkinter as tk
 from tkinter import ttk
 
+hand_finger_joint_map = {
+    'index': {
+        'index_mcp': 0,
+        'index_pip-dip' : 1,
+    },
+
+    'middle': {
+        'middle_mcp' : 2,
+        'middle_pip-dip' : 3,
+    },
+
+    'pinky' : {
+        'pinky_mcp' : 4,
+        'pinky_pip-dip' : 5,
+    },
+
+    'thumb' : {
+        'thumb_flexion-extension' : 6,
+        'thumb_adduction-abduction' : 7,
+        'thumb_mcp' : 8,
+        'thumb_pip-dip': 9
+    }
+}
+
 class GuiInterface:
     def __init__(self, master):
         self.master = master
 
         # GUI elements 
-        self.master.title("GUI Interface")
-
-        # Joint 1
-        self.joint_1_slider_label = ttk.Label(master, text="Joint 1 Position:")
-        self.joint_1_slider_label.pack(pady=20)
-
-        self.cmd_joint_1_slider = ttk.Scale(master, from_=0, to_=360, orient="horizontal", command=self.publish_cmd_joint_angle_1)
-        self.cmd_joint_1_slider.pack(pady=20)
-
-        self.joint_1_cmd_value_label = ttk.Label(master, text="Current Value: 0")
-        self.joint_1_cmd_value_label.pack(pady=20)
-
-        # Joint 2 
-        self.joint_2_slider_label = ttk.Label(master, text="Joint 2 Position:")
-        self.joint_2_slider_label.pack(pady=20)
-
-        self.cmd_joint_2_slider = ttk.Scale(master, from_=0, to_=360, orient="horizontal", command=self.publish_cmd_joint_angle_2)
-        self.cmd_joint_2_slider.pack(pady=20)
-
-        self.joint_2_cmd_value_label = ttk.Label(master, text="Current Value: 0")
-        self.joint_2_cmd_value_label.pack(pady=20)
+        self.master.title("GUI Control") 
 
         # Initialize ROS 
         rospy.init_node('gui_interface_node', anonymous=True)
-
-        # Publishers 
         self.cmd_joint_angles_pub = rospy.Publisher('/hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
 
-        self.joint_angles = [0.0, 0.0]
+        self.joint_angles = [
+            0.0,    # Index MCP
+            0.0,    # Index PIP/DIP
+            0.0,    # Middle MCP
+            0.0,    # Middle PIP/DIP
+            0.0,    # Pinky MCP
+            0.0,    # Pinky PIP/DIP
+        ]
 
-    def publish_cmd_joint_angle_1(self, value):
-        joint_1_new_position = float(value)
-        self.joint_angles[0] = joint_1_new_position
+        # Creating the GUI components
+        for i in range(3):
+            group = ttk.LabelFrame(master, text=f"Group {i+1}")
+            group.pack(padx=10, pady=10, fill="both", expand="yes")
+            self.create_slider_group(group, i)
 
-        self.joint_1_cmd_value_label.config(text=f"Joint 1 Commanded Position: {joint_1_new_position:.2f}") 
 
-        joint_angles_msg = Float32MultiArray()
-        joint_angles_msg.data = self.joint_angles
-        self.cmd_joint_angles_pub.publish(joint_angles_msg)
-    
-    def publish_cmd_joint_angle_2(self, value):
-        joint_2_new_position = float(value)
-        self.joint_angles[1] = joint_2_new_position
+    def create_slider_group(self, frame, group_index):
+        for i in range(2):
+            slider_label = ttk.Label(frame, text=f"Finger Slider {group_index*2 + i + 1}")
+            slider_label.pack(pady=5)
 
-        self.joint_2_cmd_value_label.config(text=f"Joint 2 Commanded Position: {joint_2_new_position:.2f}") 
+            slider = ttk.Scale(frame, from_=0, to_=360, orient="horizontal", 
+                               command=lambda value, index=group_index*2 + i: self.update_slider_value(value, index))
+            slider.pack(pady=5)
 
-        joint_angles_msg = Float32MultiArray()
-        joint_angles_msg.data = self.joint_angles
-        self.cmd_joint_angles_pub.publish(joint_angles_msg)
+    def update_slider_value(self, value, index):
+        self.slider_values[index] = float(value)
+
+    def start_ros_publish_loop(self):
+        def publish_values():
+            msg = Float32MultiArray()
+            msg.data = self.slider_values
+            self.pub.publish(msg)
+            self.master.after(50, publish_values)  # Publish at 20 Hz
+
+        publish_values()
 
 
 if __name__ == "__main__":
