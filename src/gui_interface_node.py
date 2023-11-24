@@ -65,6 +65,8 @@ class GuiInterface:
             group_frame.pack(padx=10, pady=10, fill="both", expand="yes")
             self.create_slider_group(group_frame, i, finger_key)
 
+        self.start_ros_publish_loop()
+
 
     def create_slider_group(self, frame, group_index, finger):
         finger_subcomponents_map = hand_finger_joint_map[finger]
@@ -99,7 +101,7 @@ class GuiInterface:
         def publish_values():
             msg = Float32MultiArray()
             msg.data = self.joint_angles
-            self.pub.publish(msg)
+            self.cmd_joint_angles_pub.publish(msg)
             self.master.after(50, publish_values)  # Publish at 20 Hz
 
         publish_values()
