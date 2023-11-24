@@ -39,10 +39,7 @@ class GuiInterface:
         # GUI elements 
         self.master.title("GUI Control") 
 
-        # Initialize ROS 
-        rospy.init_node('gui_interface_node', anonymous=True)
-        self.cmd_joint_angles_pub = rospy.Publisher('/hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
-
+        # Data storage
         self.joint_angles = [
             0.0,    # Index MCP
             0.0,    # Index PIP/DIP
@@ -56,6 +53,12 @@ class GuiInterface:
             0.0,    # Thumb PIP/DIP
         ]
 
+        self.value_labels = [None] * len(self.joint_angles)
+
+        # Initialize ROS 
+        rospy.init_node('gui_interface_node', anonymous=True)
+        self.cmd_joint_angles_pub = rospy.Publisher('/hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
+
         # Creating the GUI components
         for i, finger_key in enumerate(hand_finger_joint_map):
             group_frame = ttk.LabelFrame(master, text=f"{finger_key}")
@@ -67,14 +70,30 @@ class GuiInterface:
         finger_subcomponents_map = hand_finger_joint_map[finger]
 
         for j, finger_subcomponent_key in enumerate(finger_subcomponents_map):
+            # Create frame for each slider and value label
+            slider_frame = ttk.Frame(frame)
+            slider_frame.pack(pady=5)
+
+            # Create and pack the slider 
             slider_label = ttk.Label(frame, text=f"{finger_subcomponent_key}")
             slider_label.pack(pady=5)
-            slider = ttk.Scale(frame, from_=0, to_=359, orient="horizontal", 
-                               command=lambda value, index=finger_subcomponents_map[finger_subcomponent_key]: self.update_slider_value(value, index))
-            slider.pack(pady=5)
+
+            # Create and pack the slider 
+            slider_index = finger_subcomponents_map[finger_subcomponent_key]
+            slider = ttk.Scale(slider_frame, from_=0, to_=359, orient="horizontal")
+            slider.pack(side=tk.LEFT, padx=5)
+            slider.bind("<B1-Motion>", lambda event, index=slider_index: self.update_slider_value(event.widget.get(), index))
+
+            # Create and pack the value label 
+            value_label = ttk.Label(slider_frame, text="0")
+            value_label.pack(side=tk.LEFT, padx=5)
+
+            # Store the value label in a dictionary for later access
+            self.value_labels[slider_index] = value_label
 
     def update_slider_value(self, value, index):
         self.joint_angles[index] = float(value)
+        self.value_labels[index].config(text=f"{value:.2f}")
 
     def start_ros_publish_loop(self):
         def publish_values():
