@@ -9,27 +9,27 @@ from tkinter import ttk
 
 # Numbers correspond to position in list 
 hand_finger_joint_map = {
+    'thumb' : {
+        'thumb_flexion-extension' : 0,
+        'thumb_adduction-abduction' : 1,
+        'thumb_mcp' : 2,
+        'thumb_pip-dip': 3
+    },
+
     'index': {
-        'index_mcp': 0,
-        'index_pip-dip' : 1,
+        'index_mcp': 4,
+        'index_pip-dip' : 5,
     },
 
     'middle': {
-        'middle_mcp' : 2,
-        'middle_pip-dip' : 3,
+        'middle_mcp' : 6,
+        'middle_pip-dip' : 7,
     },
 
     'pinky' : {
-        'pinky_mcp' : 4,
-        'pinky_pip-dip' : 5,
+        'pinky_mcp' : 8,
+        'pinky_pip-dip' : 9,
     },
-
-    'thumb' : {
-        'thumb_flexion-extension' : 6,
-        'thumb_adduction-abduction' : 7,
-        'thumb_mcp' : 8,
-        'thumb_pip-dip': 9
-    }
 }
 
 class GuiInterface:
@@ -41,16 +41,16 @@ class GuiInterface:
 
         # Data storage
         self.joint_angles = [
+            0.0,    # Thumb Flexion/Extension
+            0.0,    # Thumb Adduction/Abduction
+            0.0,    # Thumb MCP
+            0.0,    # Thumb PIP/DIP
             0.0,    # Index MCP
             0.0,    # Index PIP/DIP
             0.0,    # Middle MCP
             0.0,    # Middle PIP/DIP
             0.0,    # Pinky MCP
             0.0,    # Pinky PIP/DIP
-            0.0,    # Thumb Flexion/Extension
-            0.0,    # Thumb Adduction/Abduction
-            0.0,    # Thumb MCP
-            0.0,    # Thumb PIP/DIP
         ]
 
         self.value_labels = [None] * len(self.joint_angles)
@@ -59,6 +59,8 @@ class GuiInterface:
         rospy.init_node('gui_interface_node', anonymous=True)
         self.cmd_joint_angles_pub = rospy.Publisher('/hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
 
+        self.get_joint_angles_sub = rospy.Subscriber('hand/motors/get_joint_angles', Float32MultiArray, self.get_joint_angles_callback, queue_size=1)
+
         # Creating the GUI components
         for i, finger_key in enumerate(hand_finger_joint_map):
             group_frame = ttk.LabelFrame(master, text=f"{finger_key}")
@@ -66,7 +68,6 @@ class GuiInterface:
             self.create_slider_group(group_frame, i, finger_key)
 
         self.start_ros_publish_loop()
-
 
     def create_slider_group(self, frame, group_index, finger):
         finger_subcomponents_map = hand_finger_joint_map[finger]
@@ -105,6 +106,14 @@ class GuiInterface:
             self.master.after(50, publish_values)  # Publish at 20 Hz
 
         publish_values()
+
+    def get_joint_angles_callback(self, msg):
+        for i, value in enumerate(msg):
+            self.joint_angles[i] = value
+            self.value_labels[i].config(text=f"{value:.2f}")
+            self.sliders[i].set(value)
+        
+        self.get_joint_angles_sub.unregister()
 
 
 if __name__ == "__main__":
