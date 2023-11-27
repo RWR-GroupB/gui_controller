@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>gui_interface</name>
-  <version>0.0.0</version>
+  <name>gui_controller</name>
+  <version>0.1.0</version>
   <description>GUI for displaying and sending information to hand.</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/gui_interface</url> -->
+  <!-- <url type="website">http://wiki.ros.org/gui_controller</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
