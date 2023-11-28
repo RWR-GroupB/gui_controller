@@ -7,6 +7,8 @@ from std_msgs.msg import Float32MultiArray
 import tkinter as tk
 from tkinter import ttk
 
+import numpy as np
+
 # Numbers correspond to position in list 
 hand_finger_joint_map = {
     'thumb' : {
@@ -54,10 +56,11 @@ class GuiInterface:
         ]
 
         self.value_labels = [None] * len(self.joint_angles)
+        self.sliders = [None] * len(self.joint_angles)
 
         # Initialize ROS 
         rospy.init_node('gui_interface_node', anonymous=True)
-        self.cmd_joint_angles_pub = rospy.Publisher('/hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
+        self.cmd_joint_angles_pub = rospy.Publisher('hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
 
         self.get_joint_angles_sub = rospy.Subscriber('hand/motors/get_joint_angles', Float32MultiArray, self.get_joint_angles_callback, queue_size=1)
 
@@ -83,9 +86,12 @@ class GuiInterface:
 
             # Create and pack the slider 
             slider_index = finger_subcomponents_map[finger_subcomponent_key]
-            slider = ttk.Scale(slider_frame, from_=0, to_=359, orient="horizontal")
+            slider = ttk.Scale(slider_frame, from_=0, to_=90, orient="horizontal")
             slider.pack(side=tk.LEFT, padx=5)
             slider.bind("<B1-Motion>", lambda event, index=slider_index: self.update_slider_value(event.widget.get(), index))
+
+            # Storing the slider for later access
+            self.sliders[slider_index] = slider
 
             # Create and pack the value label 
             value_label = ttk.Label(slider_frame, text="0")
@@ -108,10 +114,13 @@ class GuiInterface:
         publish_values()
 
     def get_joint_angles_callback(self, msg):
-        for i, value in enumerate(msg):
+        print(msg.data)
+        for i, value in enumerate(msg.data):
             self.joint_angles[i] = value
             self.value_labels[i].config(text=f"{value:.2f}")
-            self.sliders[i].set(value)
+
+            if self.sliders[i] is not None:
+                self.sliders[i].set(value)
         
         self.get_joint_angles_sub.unregister()
 
