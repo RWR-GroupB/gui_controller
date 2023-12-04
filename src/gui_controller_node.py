@@ -69,6 +69,16 @@ class GuiInterface:
             group_frame.pack(padx=10, pady=10, fill="both", expand="yes")
             self.create_slider_group(group_frame, i, finger_key)
 
+        # Slider to create gripping motion 
+        self.grasp_slider_frame = ttk.Frame(master)
+        self.grasp_slider_frame.pack(pady=10)
+
+        self.grasp_slider_label = ttk.Label(self.grasp_slider_frame, text="Grasp Control")
+        self.grasp_slider_label.pack(side=tk.LEFT, padx=5)
+
+        self.grasp_slider = ttk.Scale(self.grasp_slider_frame, from_=0, to_=90, orient="horizontal", command=self.update_grasp_slider)
+        self.grasp_slider.pack(side=tk.LEFT, padx=5)
+
         self.start_ros_publish_loop()
 
     def create_slider_group(self, frame, group_index, finger):
@@ -123,6 +133,23 @@ class GuiInterface:
         
         self.get_joint_angles_sub.unregister()
 
+    def update_grasp_slider(self, value):
+        for slider in self.sliders:
+            if slider is not None:
+                slider.set(value)
+        
+        # Update all joint angles and value labels
+        for i in range(len(self.joint_angles)):
+            self.update_slider_value(value, i, update_grasp=False)
+
+    def update_slider_value(self, value, index, update_grasp=False):
+        value = float(value)
+        self.joint_angles[index] = value
+        self.value_labels[index].config(text=f"{value:.2f}")
+
+        # Update grasp_slider only if necessary to avoid infinite loops
+        if update_grasp:
+            self.grasp_slider.set(np.mean(self.joint_angles))
 
 if __name__ == "__main__":
     root = tk.Tk()
