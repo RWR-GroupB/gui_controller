@@ -12,25 +12,24 @@ import numpy as np
 # Numbers correspond to position in list self.joint_angles
 hand_finger_joint_map = {
     'thumb' : {
-        # 'thumb_flexion-extension' : 0,
-        'thumb_adduction-abduction' : 0,
-        'thumb_mcp' : 1,
-        'thumb_pip-dip': 2,
+        'thumb_adduction-abduction' : (0, (-35, 35)),
+        'thumb_mcp' : (1, (0, 90)),
+        'thumb_pip-dip': (2, (0, 90)),
     },
 
     'index': {
-        'index_mcp': 3,
-        'index_pip-dip' : 4,
+        'index_mcp': (3, (0, 90)),
+        'index_pip-dip' : (4, (0, 90)),
     },
 
     'middle': {
-        'middle_mcp' : 5,
-        'middle_pip-dip' : 6,
+        'middle_mcp' : (5, (0, 90)),
+        'middle_pip-dip' : (6, (0, 90)),
     },
 
     'pinky' : {
-        'pinky_mcp' : 7,
-        'pinky_pip-dip' : 8,
+        'pinky_mcp' : (7, (0, 90)),
+        'pinky_pip-dip' : (8, (0, 90)),
     },
 }
 
@@ -94,8 +93,9 @@ class GuiInterface:
             slider_label.pack(pady=5)
 
             # Create and pack the slider 
-            slider_index = finger_subcomponents_map[finger_subcomponent_key]
-            slider = ttk.Scale(slider_frame, from_=0, to_=150, orient="horizontal")
+            slider_index = finger_subcomponents_map[finger_subcomponent_key][0]
+            slider_limit_min, slider_limit_max = finger_subcomponents_map[finger_subcomponent_key][1]
+            slider = ttk.Scale(slider_frame, from_=slider_limit_min, to_=slider_limit_max, orient="horizontal")
             slider.pack(side=tk.LEFT, padx=5)
             slider.bind("<B1-Motion>", lambda event, index=slider_index: self.update_slider_value(event.widget.get(), index))
 
@@ -134,7 +134,7 @@ class GuiInterface:
     #     self.get_joint_angles_sub.unregister()
 
     def update_grasp_slider(self, value):
-        thumb_adduction_abduction_index = hand_finger_joint_map['thumb']['thumb_adduction-abduction']
+        thumb_adduction_abduction_index = hand_finger_joint_map['thumb']['thumb_adduction-abduction'][0]
 
         for i, slider in enumerate(self.sliders):
             # Thumb adduction-abduction should be at 0 when performing simple grasping
