@@ -61,7 +61,7 @@ class GuiInterface:
         rospy.init_node('gui_interface_node', anonymous=True)
         self.cmd_joint_angles_pub = rospy.Publisher('hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
 
-        self.get_joint_angles_sub = rospy.Subscriber('hand/motors/get_joint_angles', Float32MultiArray, self.get_joint_angles_callback, queue_size=1)
+        # self.get_joint_angles_sub = rospy.Subscriber('hand/motors/get_joint_angles', Float32MultiArray, self.get_joint_angles_callback, queue_size=1)
 
         # Creating the GUI components
         for i, finger_key in enumerate(hand_finger_joint_map):
@@ -122,16 +122,16 @@ class GuiInterface:
 
         publish_values()
 
-    def get_joint_angles_callback(self, msg):
-        print(msg.data)
-        for i, value in enumerate(msg.data):
-            self.joint_angles[i] = value
-            self.value_labels[i].config(text=f"{value:.2f}")
+    # def get_joint_angles_callback(self, msg):
+    #     print(msg.data)
+    #     for i, value in enumerate(msg.data):
+    #         self.joint_angles[i] = value
+    #         self.value_labels[i].config(text=f"{value:.2f}")
 
-            if self.sliders[i] is not None:
-                self.sliders[i].set(value)
+    #         if self.sliders[i] is not None:
+    #             self.sliders[i].set(value)
         
-        self.get_joint_angles_sub.unregister()
+    #     self.get_joint_angles_sub.unregister()
 
     def update_grasp_slider(self, value):
         thumb_adduction_abduction_index = hand_finger_joint_map['thumb']['thumb_adduction-abduction']
