@@ -9,28 +9,28 @@ from tkinter import ttk
 
 import numpy as np
 
-# Numbers correspond to position in list 
+# Numbers correspond to position in list self.joint_angles
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_flexion-extension' : 0,
-        'thumb_adduction-abduction' : 1,
-        'thumb_mcp' : 2,
-        'thumb_pip-dip': 3
+        # 'thumb_flexion-extension' : 0,
+        'thumb_adduction-abduction' : 0,
+        'thumb_mcp' : 1,
+        'thumb_pip-dip': 2,
     },
 
     'index': {
-        'index_mcp': 4,
-        'index_pip-dip' : 5,
+        'index_mcp': 3,
+        'index_pip-dip' : 4,
     },
 
     'middle': {
-        'middle_mcp' : 6,
-        'middle_pip-dip' : 7,
+        'middle_mcp' : 5,
+        'middle_pip-dip' : 6,
     },
 
     'pinky' : {
-        'pinky_mcp' : 8,
-        'pinky_pip-dip' : 9,
+        'pinky_mcp' : 7,
+        'pinky_pip-dip' : 8,
     },
 }
 
@@ -43,7 +43,6 @@ class GuiInterface:
 
         # Data storage
         self.joint_angles = [
-            0.0,    # Thumb Flexion/Extension
             0.0,    # Thumb Adduction/Abduction
             0.0,    # Thumb MCP
             0.0,    # Thumb PIP/DIP
@@ -86,7 +85,7 @@ class GuiInterface:
 
             # Create and pack the slider 
             slider_index = finger_subcomponents_map[finger_subcomponent_key]
-            slider = ttk.Scale(slider_frame, from_=0, to_=90, orient="horizontal")
+            slider = ttk.Scale(slider_frame, from_=0, to_=150, orient="horizontal")
             slider.pack(side=tk.LEFT, padx=5)
             slider.bind("<B1-Motion>", lambda event, index=slider_index: self.update_slider_value(event.widget.get(), index))
 
