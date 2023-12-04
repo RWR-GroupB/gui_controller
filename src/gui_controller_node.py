@@ -134,13 +134,21 @@ class GuiInterface:
         self.get_joint_angles_sub.unregister()
 
     def update_grasp_slider(self, value):
-        for slider in self.sliders:
+        thumb_adduction_abduction_index = hand_finger_joint_map['thumb']['thumb_adduction-abduction']
+
+        for i, slider in enumerate(self.sliders):
+            # Thumb adduction-abduction should be at 0 when performing simple grasping
+            slider_value = 0.0 if i == thumb_adduction_abduction_index else value
+
             if slider is not None:
-                slider.set(value)
+                slider.set(slider_value)
         
         # Update all joint angles and value labels
         for i in range(len(self.joint_angles)):
-            self.update_slider_value(value, i, update_grasp=False)
+            # Thumb adduction-abduction should be at 0 when performing simple grasping
+            joint_angle_value = 0.0 if i == thumb_adduction_abduction_index else value
+
+            self.update_slider_value(joint_angle_value, i, update_grasp=False)
 
     def update_slider_value(self, value, index, update_grasp=False):
         value = float(value)
