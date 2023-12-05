@@ -11,23 +11,23 @@ import numpy as np
 # Numbers correspond to position in list self.joint_angles and their range limits
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_adduction-abduction' : (0, (-15, 15)),
+        'thumb_adduction-abduction' : (0, (-15, 35)),
         'thumb_mcp' : (1, (0, 90)),
         'thumb_pip-dip': (2, (0, 90)),
     },
 
     'index': {
-        'index_mcp': (3, (0, 100)),
+        'index_mcp': (3, (0, 105)),
         'index_pip-dip' : (4, (0, 130)),
     },
 
     'middle': {
-        'middle_mcp' : (5, (0, 100)),
+        'middle_mcp' : (5, (0, 105)),
         'middle_pip-dip' : (6, (0, 130)),
     },
 
     'pinky' : {
-        'pinky_mcp' : (7, (0, 100)),
+        'pinky_mcp' : (7, (0, 105)),
         'pinky_pip-dip' : (8, (0, 130)),
     },
 }
@@ -63,7 +63,7 @@ class GuiInterface:
         self.grasp_slider_label = ttk.Label(self.grasp_slider_frame, text="Grasp Control")
         self.grasp_slider_label.pack(side=tk.LEFT, padx=5)
 
-        self.grasp_slider = ttk.Scale(self.grasp_slider_frame, from_=0, to_=90, orient="horizontal", command=self.update_grasp_slider)
+        self.grasp_slider = ttk.Scale(self.grasp_slider_frame, from_=0, to_=100, orient="horizontal", command=self.update_grasp_slider)
         self.grasp_slider.pack(side=tk.LEFT, padx=5)
 
         self.start_ros_publish_loop()
