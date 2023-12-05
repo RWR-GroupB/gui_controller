@@ -8,27 +8,27 @@ from tkinter import ttk
 
 import numpy as np
 
-# Numbers correspond to position in list self.joint_angles
+# Numbers correspond to position in list self.joint_angles and their range limits
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_adduction-abduction' : (0, (-35, 35)),
+        'thumb_adduction-abduction' : (0, (-15, 15)),
         'thumb_mcp' : (1, (0, 90)),
         'thumb_pip-dip': (2, (0, 90)),
     },
 
     'index': {
-        'index_mcp': (3, (0, 90)),
-        'index_pip-dip' : (4, (0, 90)),
+        'index_mcp': (3, (0, 100)),
+        'index_pip-dip' : (4, (0, 130)),
     },
 
     'middle': {
-        'middle_mcp' : (5, (0, 90)),
-        'middle_pip-dip' : (6, (0, 90)),
+        'middle_mcp' : (5, (0, 100)),
+        'middle_pip-dip' : (6, (0, 130)),
     },
 
     'pinky' : {
-        'pinky_mcp' : (7, (0, 90)),
-        'pinky_pip-dip' : (8, (0, 90)),
+        'pinky_mcp' : (7, (0, 100)),
+        'pinky_pip-dip' : (8, (0, 130)),
     },
 }
 
@@ -40,17 +40,8 @@ class GuiInterface:
         self.master.title("GUI Control") 
 
         # Data storage
-        self.joint_angles = [
-            0.0,    # Thumb Adduction/Abduction
-            0.0,    # Thumb MCP
-            0.0,    # Thumb PIP/DIP
-            0.0,    # Index MCP
-            0.0,    # Index PIP/DIP
-            0.0,    # Middle MCP
-            0.0,    # Middle PIP/DIP
-            0.0,    # Pinky MCP
-            0.0,    # Pinky PIP/DIP
-        ]
+        self.number_of_joints = 9
+        self.joint_angles = [0] * self.number_of_joints
 
         self.value_labels = [None] * len(self.joint_angles)
         self.sliders = [None] * len(self.joint_angles)
@@ -58,8 +49,6 @@ class GuiInterface:
         # Initialize ROS 
         rospy.init_node('gui_interface_node', anonymous=True)
         self.cmd_joint_angles_pub = rospy.Publisher('hand/motors/cmd_joint_angles', Float32MultiArray, queue_size=1)
-
-        # self.get_joint_angles_sub = rospy.Subscriber('hand/motors/get_joint_angles', Float32MultiArray, self.get_joint_angles_callback, queue_size=1)
 
         # Creating the GUI components
         for i, finger_key in enumerate(hand_finger_joint_map):
@@ -120,17 +109,6 @@ class GuiInterface:
             self.master.after(50, publish_values)  # Publish at 20 Hz
 
         publish_values()
-
-    # def get_joint_angles_callback(self, msg):
-    #     print(msg.data)
-    #     for i, value in enumerate(msg.data):
-    #         self.joint_angles[i] = value
-    #         self.value_labels[i].config(text=f"{value:.2f}")
-
-    #         if self.sliders[i] is not None:
-    #             self.sliders[i].set(value)
-        
-    #     self.get_joint_angles_sub.unregister()
 
     def update_grasp_slider(self, value):
         thumb_adduction_abduction_index = hand_finger_joint_map['thumb']['thumb_adduction-abduction'][0]
