@@ -32,6 +32,12 @@ hand_finger_joint_map = {
     },
 }
 
+button_preprogrammed_movements = {
+    "ok_sign": [29.12, 10.59, 64.85, 105.0, 93.68, 58.68, 53.53, 38.60, 0.0],
+    "flat_pinch": [0.0, 90.0, 72.79, 105.0, 130.0, 105.0, 130.0, 105.0, 130.0], 
+    "pen_grip" : [0.0, 90.0, 0.0, 105.0, 130.0, 105.0, 130.0, 105.0, 130.0],
+}
+
 class GuiInterface:
     def __init__(self, master):
         self.master = master
@@ -65,6 +71,15 @@ class GuiInterface:
 
         self.grasp_slider = ttk.Scale(self.grasp_slider_frame, from_=0, to_=100, orient="horizontal", command=self.update_grasp_slider)
         self.grasp_slider.pack(side=tk.LEFT, padx=5)
+
+        # Buttons for preprogrammed movements
+        self.buttons_frame = ttk.Frame(master)
+        self.buttons_frame.pack(pady=10)
+
+        for movement_name, angles in button_preprogrammed_movements.items():
+            button = ttk.Button(self.buttons_frame, text=movement_name, 
+                                command=lambda a=angles: self.set_preprogrammed_movement(a))
+            button.pack(padx=5, pady=5)
 
         self.start_ros_publish_loop()
 
@@ -101,11 +116,19 @@ class GuiInterface:
         self.joint_angles[index] = float(value)
         self.value_labels[index].config(text=f"{value:.2f}")
 
+    # def start_ros_publish_loop(self):
+    #     def publish_values():
+    #         msg = Float32MultiArray()
+    #         msg.data = self.joint_angles
+    #         self.cmd_joint_angles_pub.publish(msg)
+    #         self.master.after(50, publish_values)  # Publish at 20 Hz
+
+    #     publish_values()
+
+    # Update the start_ros_publish_loop method to call publish_joint_angles
     def start_ros_publish_loop(self):
         def publish_values():
-            msg = Float32MultiArray()
-            msg.data = self.joint_angles
-            self.cmd_joint_angles_pub.publish(msg)
+            self.publish_joint_angles()
             self.master.after(50, publish_values)  # Publish at 20 Hz
 
         publish_values()
@@ -135,6 +158,22 @@ class GuiInterface:
         # Update grasp_slider only if necessary to avoid infinite loops
         if update_grasp:
             self.grasp_slider.set(np.mean(self.joint_angles))
+
+    def set_preprogrammed_movement(self, angles):
+        for i, angle in enumerate(angles):
+            self.joint_angles[i] = angle
+            if self.sliders[i] is not None:
+                self.sliders[i].set(angle)
+            if self.value_labels[i] is not None:
+                self.value_labels[i].config(text=f"{angle:.2f}")
+
+        # Immediately publish the new joint angles
+        self.publish_joint_angles()
+
+    def publish_joint_angles(self):
+        msg = Float32MultiArray()
+        msg.data = self.joint_angles
+        self.cmd_joint_angles_pub.publish(msg)
 
 if __name__ == "__main__":
     root = tk.Tk()
