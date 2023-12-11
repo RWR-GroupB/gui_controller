@@ -45,6 +45,14 @@ class GuiInterface:
         # GUI elements 
         self.master.title("GUI Control") 
 
+        # Create main frames for sliders and buttons
+        self.sliders_frame = ttk.Frame(master)
+        self.buttons_frame = ttk.Frame(master)
+
+        # Pack the main frames
+        self.sliders_frame.pack(side=tk.LEFT, fill="both", expand=True)
+        self.buttons_frame.pack(side=tk.RIGHT, fill="both", expand=True)
+
         # Data storage
         self.number_of_joints = 9
         self.joint_angles = [0] * self.number_of_joints
@@ -58,12 +66,12 @@ class GuiInterface:
 
         # Creating the GUI components
         for i, finger_key in enumerate(hand_finger_joint_map):
-            group_frame = ttk.LabelFrame(master, text=f"{finger_key}")
+            group_frame = ttk.LabelFrame(self.sliders_frame, text=f"{finger_key}")
             group_frame.pack(padx=10, pady=10, fill="both", expand="yes")
             self.create_slider_group(group_frame, i, finger_key)
 
         # Slider to create gripping motion 
-        self.grasp_slider_frame = ttk.Frame(master)
+        self.grasp_slider_frame = ttk.Frame(self.sliders_frame)
         self.grasp_slider_frame.pack(pady=10)
 
         self.grasp_slider_label = ttk.Label(self.grasp_slider_frame, text="Grasp Control")
@@ -73,8 +81,8 @@ class GuiInterface:
         self.grasp_slider.pack(side=tk.LEFT, padx=5)
 
         # Buttons for preprogrammed movements
-        self.buttons_frame = ttk.Frame(master)
-        self.buttons_frame.pack(pady=10)
+        # self.buttons_frame = ttk.Frame(master)
+        # self.buttons_frame.pack(pady=10)
 
         for movement_name, angles in button_preprogrammed_movements.items():
             button = ttk.Button(self.buttons_frame, text=movement_name, 
