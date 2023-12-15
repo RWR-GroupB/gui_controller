@@ -11,32 +11,32 @@ import numpy as np
 # Numbers correspond to position in list self.joint_angles and their range limits
 hand_finger_joint_map = {
     'thumb' : {
-        'thumb_adduction-abduction' : (0, (-15, 35)),
-        'thumb_mcp' : (1, (0, 90)),
-        'thumb_pip-dip': (2, (0, 90)),
+        'thumb_adduction-abduction' : (0, (-25, 25)),
+        'thumb_mcp' : (1, (0, 90/2)),
+        'thumb_pip-dip': (2, (0, 90/2)),
     },
 
     'index': {
-        'index_mcp': (3, (0, 105)),
-        'index_pip-dip' : (4, (0, 130)),
+        'index_mcp': (3, (0, 105/2)),
+        'index_pip-dip' : (4, (0, 130/2)),
     },
 
     'middle': {
-        'middle_mcp' : (5, (0, 105)),
-        'middle_pip-dip' : (6, (0, 130)),
+        'middle_mcp' : (5, (0, 105/2)),
+        'middle_pip-dip' : (6, (0, 130/2)),
     },
 
     'pinky' : {
-        'pinky_mcp' : (7, (0, 105)),
-        'pinky_pip-dip' : (8, (0, 130)),
+        'pinky_mcp' : (7, (0, 105/2)),
+        'pinky_pip-dip' : (8, (0, 130/2)),
     },
 }
 
 button_preprogrammed_movements = {
     "initial_position" : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    "ok_sign": [29.12, 10.59, 64.85, 105.0, 93.68, 58.68, 53.53, 38.60, 0.0],
-    "flat_pinch": [0.0, 90.0, 72.79, 105.0, 130.0, 105.0, 130.0, 105.0, 130.0], 
-    "pen_grip" : [0.0, 90.0, 0.0, 105.0, 130.0, 105.0, 130.0, 105.0, 130.0],
+    "ok_sign": [29.12, 10.59/2, 64.85/2, 105.0/2, 93.68/2, 58.68/2, 53.53/2, 38.60/2, 0.0/2],
+    "flat_pinch": [0.0, 90.0/2, 72.79/2, 105.0/2, 130.0/2, 105.0/2, 130.0/2, 105.0/2, 130.0/2], 
+    "pen_grip" : [0.0, 90.0/2, 0.0/2, 105.0/2, 130.0/2, 105.0/2, 130.0/2, 105.0/2, 130.0/2],
 }
 
 class GuiInterface:
